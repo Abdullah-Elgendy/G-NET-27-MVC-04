@@ -48,7 +48,7 @@ namespace GymManagement.BLL.Services.Classes
                     Phone = x.Phone,
                     Photo = x.Photo,
                     id = x.Id
-                });
+                }).ToList();
 
             return membersViewModel;
         }
@@ -57,9 +57,9 @@ namespace GymManagement.BLL.Services.Classes
             //Logic  Create Member To Database
 
             //Check Email Unique
-            bool emailExists = await _memberRepo.AnyAsync(x => x.Email == member.Email);
+            var emailExists = await _memberRepo.AnyAsync(x => x.Email == member.Email, ct);
             //Checking Phone Number Unique
-            bool phoneExists = await _memberRepo.AnyAsync(x => x.Phone == member.Phone);
+            var phoneExists = await _memberRepo.AnyAsync(x => x.Phone == member.Phone, ct);
 
             if (emailExists || phoneExists) return false;
 

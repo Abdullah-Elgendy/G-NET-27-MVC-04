@@ -39,10 +39,19 @@ namespace GymManagement.PL.Controllers
         // POST baseUrl/Members/Create {Member}
         // Create - Create Member after form submit 
         [HttpPost]
-        public IActionResult Create(CreateMemberViewModel model, CancellationToken ct)
+        public async Task<IActionResult> Create(CreateMemberViewModel model, CancellationToken ct)
         {
-            //Add member to database
-            return View(model);
+            if (!ModelState.IsValid) return View(nameof(Create), model);
+
+            var res = await _memberService.CreateMemberAsync(model, ct);
+
+            if (res)
+                TempData["SuccessMessage"] = "Member Created Successfully";
+            else
+                TempData["ErrorMessage"] = "Failed To Create Member";
+
+
+            return RedirectToAction(nameof(Index), TempData);
         }
         #endregion
 

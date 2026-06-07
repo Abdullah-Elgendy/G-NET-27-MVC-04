@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="~/css/bootstrap.min.css" />
     <!-- ^ Our main css file -->
     <link rel="stylesheet" href="~/css/style.css" />
-    <title>Power fitness | Home</title>
+    <title>Power fitness | @ViewData["Title"] </title>
 </head>
 
 <body>
@@ -76,12 +76,11 @@
            
         </div>
 
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
         <script src="~/js/bootstrap.bundle.min.js"></script>
         <script src="~/js/site.js"></script>
-        <script src="~/lib/jquery/dist/jquery.min.js"></script>
-        <script src="~/js/jquery.validate.min.js"></script>
-        <script src="~/js/jquery.validate.unobtrusive.min.js"></script>
         @await RenderSectionAsync("Scripts", required: false)
+        @await RenderSectionAsync("ValidationScripts", required: false)
     </body>
 
 </html>
