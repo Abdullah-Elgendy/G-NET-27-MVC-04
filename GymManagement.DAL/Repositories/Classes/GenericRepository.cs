@@ -2,6 +2,7 @@
 using GymManagement.DAL.Data.Models;
 using GymManagement.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace GymManagement.DAL.Repositories.Classes
 {
@@ -19,6 +20,11 @@ namespace GymManagement.DAL.Repositories.Classes
         {
             _set.Add(entity);
             return await _dbContext.SaveChangesAsync(ct);
+        }
+
+        public Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default)
+        {
+            return _set.AsNoTracking().AnyAsync(predicate, ct);
         }
 
         public async Task<int> DeleteAsync(TEntity entity, CancellationToken ct = default)

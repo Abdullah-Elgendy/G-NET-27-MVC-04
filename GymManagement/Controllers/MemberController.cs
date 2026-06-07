@@ -6,29 +6,25 @@ namespace GymManagement.PL.Controllers
 {
     public class MemberController : Controller
     {
+        #region Constructor and Services
         private readonly IMemberService _memberService;
         public MemberController(IMemberService memberService)
         {
             _memberService = memberService;
-        }
+        } 
+        #endregion
 
+        //===============================================================================
+
+        #region Get All Members
         // GET baseUrl/Members/Index
         // Index - List of all members
         public async Task<IActionResult> Index(CancellationToken ct)
         {
             var members = await _memberService.GetMembersAsync(ct);
             return View(members);
-        }
-
-        #region Member Details
-        // GET baseUrl/Members/MemberDetails/{id}
-        // MemberDetails - Show one member's details 
-        #endregion
-
-        #region Health Record Details
-        // GET baseUrl/Members/HealthRecordDetails/{id}
-        // HealthRecordDetails - show one member's details 
-        #endregion
+        } 
+        #endregion 
 
         #region Create Member
         // GET baseUrl/Members/Create
@@ -40,15 +36,24 @@ namespace GymManagement.PL.Controllers
             return View();
         }
 
+        // POST baseUrl/Members/Create {Member}
+        // Create - Create Member after form submit 
         [HttpPost]
         public IActionResult Create(CreateMemberViewModel model, CancellationToken ct)
         {
             //Add member to database
-            return View();
+            return View(model);
         }
+        #endregion
 
-        // POST baseUrl/Members/Create {Member}
-        // Create - Create Member after form submit 
+        #region Member Details
+        // GET baseUrl/Members/MemberDetails/{id}
+        // MemberDetails - Show one member's details 
+        #endregion
+
+        #region Health Record Details
+        // GET baseUrl/Members/HealthRecordDetails/{id}
+        // HealthRecordDetails - show one member's details 
         #endregion
 
         #region Edit Member

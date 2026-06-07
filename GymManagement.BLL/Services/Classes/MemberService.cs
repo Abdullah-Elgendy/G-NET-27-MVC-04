@@ -41,33 +41,57 @@ namespace GymManagement.BLL.Services.Classes
 
             var membersViewModel = members.Select(
                 x => new MemberViewModel()
-            {
-                Name = x.Name,
-                Email = x.Email,
-                Gender = x.Gender.ToString(),
-                Phone = x.Phone,
-                Photo = x.Photo,
-                id = x.Id
-            });
+                {
+                    Name = x.Name,
+                    Email = x.Email,
+                    Gender = x.Gender.ToString(),
+                    Phone = x.Phone,
+                    Photo = x.Photo,
+                    id = x.Id
+                });
 
             return membersViewModel;
         }
-
-        public async Task<bool> CreateMemberAsync(CreateMemberViewModel model, CancellationToken ct = default)
+        public async Task<bool> CreateMemberAsync(CreateMemberViewModel member, CancellationToken ct = default)
         {
-            #region Logic  Create Member To Database
+            //Logic  Create Member To Database
+
             //Check Email Unique
-
-
+            bool emailExists = await _memberRepo.AnyAsync(x => x.Email == member.Email);
             //Checking Phone Number Unique
-            #endregion
+            bool phoneExists = await _memberRepo.AnyAsync(x => x.Phone == member.Phone);
 
+            if (emailExists || phoneExists) return false;
 
 
             //Casting/Mapping from CreateMemberViewModel To Member
+            var createdMember = new Member
+            {
+                Name = member.Name,
+                Email = member.Email,
+                Phone = member.Phone,
+                Gender = member.Gender,
+                DateOfBirth = member.DateOfBirth,
+                Address = new Address
+                {
+                    City = member.City,
+                    Street = member.Street,
+                    BuildingNo = member.BuildingNumber
+                },
+                HealthRecord = new HealthRecord
+                {
+                    BloodType = member.HealthRecordViewModel.BloodType,
+                    Weight = member.HealthRecordViewModel.Weight,
+                    Height = member.HealthRecordViewModel.Height,
+                    Note = member.HealthRecordViewModel.Note,
+                }
+            };
 
             //Add To Database
-            return true;
+            var rowsAffected = await _memberRepo.AddAsync(createdMember);
+
+            return rowsAffected > 0;
         }
+
     }
 }
