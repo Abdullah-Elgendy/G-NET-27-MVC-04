@@ -8,9 +8,14 @@ namespace GymManagement.BLL.Services.Classes
     public class MemberService : IMemberService
     {
         private readonly IGenericRepository<Member> _memberRepo;
-        public MemberService(IGenericRepository<Member> memberRepo)
+        private readonly IGenericRepository<MemberPlans> _memberShipRepo;
+        private readonly IGenericRepository<Plan> _planRepo;
+
+        public MemberService(IGenericRepository<Member> memberRepo, IGenericRepository<MemberPlans> memberShipRepo, IGenericRepository<Plan> planRepo)
         {
             _memberRepo = memberRepo;
+            _memberShipRepo = memberShipRepo;
+            _planRepo = planRepo;
         }
         public async Task<IEnumerable<MemberViewModel>> GetMembersAsync(CancellationToken ct)
         {
@@ -93,5 +98,37 @@ namespace GymManagement.BLL.Services.Classes
             return rowsAffected > 0;
         }
 
+        public async Task<MemberViewModel?> GetMemberDetails(int id, CancellationToken ct = default)
+        {
+            var member = await _memberRepo.GetByIdAsync(id, ct);
+            if (member == null) return null;
+
+            //cast to membervciewmodel
+            var model = new MemberViewModel()
+            {
+                id = member.Id,
+                Name = member.Name,
+                Email = member.Email,
+                Phone = member.Phone,
+                Gender = member.Gender.ToString(),
+                Photo = member.Photo,
+                DateOfBirth = member.DateOfBirth.ToString(),
+                Address = $"{member.Address.BuildingNo} - {member.Address.Street} - {member.Address.City}",
+                
+            };
+
+            var activeMembership = await _memberShipRepo.FirstOrDefaultAsync(x => x.MemberId == member.Id && x.EndDate > DateTime.Now);
+           
+            if(activeMembership is not null)
+            {
+                var currentPlan = await _planRepo.GetByIdAsync(activeMembership.PlanId, ct);
+
+                model.PlanName = currentPlan?.Name;
+                model.MemberShipStartDate = activeMembership.CreatedAt.ToString();
+                model.MemberShipEndDate = activeMembership.EndDate.ToString();
+            }
+
+            return model;
+        }
     }
 }

@@ -58,6 +58,17 @@ namespace GymManagement.PL.Controllers
         #region Member Details
         // GET baseUrl/Members/MemberDetails/{id}
         // MemberDetails - Show one member's details 
+        public async Task<IActionResult> MemberDetails(int id, CancellationToken ct = default)
+        {
+            var member = await _memberService.GetMemberDetails(id, ct);
+
+            if (member is null)
+            {
+                TempData["ErrorMessage"] = "Member Not Found!";
+                RedirectToAction(nameof(Index), TempData);
+            }
+            return View(member);
+        }
         #endregion
 
         #region Health Record Details
