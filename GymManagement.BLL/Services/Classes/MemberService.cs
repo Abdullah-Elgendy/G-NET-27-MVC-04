@@ -3,6 +3,7 @@ using GymManagement.BLL.ViewModels.HealthRecordViewModels;
 using GymManagement.BLL.ViewModels.MemberViewModels;
 using GymManagement.DAL.Data.Models;
 using GymManagement.DAL.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace GymManagement.BLL.Services.Classes
 {
@@ -148,6 +149,47 @@ namespace GymManagement.BLL.Services.Classes
             };
 
             return model;
+        }
+
+        public async Task<MemberToUpdateViewModel?> GetMemberToUpdateAsync(int id, CancellationToken ct = default)
+        {
+            var member = await _memberRepo.GetByIdAsync(id, ct);
+            if (member is null) return null;
+
+            var model = new MemberToUpdateViewModel()
+            {
+                Name = member.Name,
+                Phone = member.Phone,
+                Street = member.Address.Street,
+                BuildingNumber = member.Address.BuildingNo,
+                City = member.Address.City,
+                Email = member.Email,
+                Photo = member.Photo
+            };
+
+            return model;
+        }
+
+        public async Task<bool> UpdateMemberAsync(int id,MemberToUpdateViewModel updatedMember, CancellationToken ct)
+        {
+            var member = await _memberRepo.GetByIdAsync(id, ct);
+            if (member is null) return false;
+
+            var emailExists = await _memberRepo.AnyAsync(x => x.Email == updatedMember.Email && x.Id != id, ct);
+            var phoneExists = await _memberRepo.AnyAsync(x => x.Phone == updatedMember.Phone && x.Id != id, ct);
+
+            if (emailExists || phoneExists) return false;
+
+            member.UpdatedAt = DateTime.Now;
+            member.Email = updatedMember.Email;
+            member.Phone = updatedMember.Phone;
+            member.Address.BuildingNo = updatedMember.BuildingNumber;
+            member.Address.City = updatedMember.City;
+            member.Address.Street = updatedMember.Street;
+
+            var res = await _memberRepo.UpdateAsync(member);
+
+            return res > 0;
         }
     }
 }

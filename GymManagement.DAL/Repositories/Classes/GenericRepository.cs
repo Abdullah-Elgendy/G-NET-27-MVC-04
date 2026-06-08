@@ -22,9 +22,9 @@ namespace GymManagement.DAL.Repositories.Classes
             return await _dbContext.SaveChangesAsync(ct);
         }
 
-        public Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default)
+        public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default)
         {
-            return _set.AsNoTracking().AnyAsync(predicate, ct);
+            return await _set.AsNoTracking().AnyAsync(predicate, ct);
         }
 
         public async Task<int> DeleteAsync(TEntity entity, CancellationToken ct = default)
