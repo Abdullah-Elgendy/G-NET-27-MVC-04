@@ -60,7 +60,7 @@ namespace GymManagement.PL.Controllers
         // MemberDetails - Show one member's details 
         public async Task<IActionResult> MemberDetails(int id, CancellationToken ct = default)
         {
-            var member = await _memberService.GetMemberDetails(id, ct);
+            var member = await _memberService.GetMemberDetailsAsync(id, ct);
 
             if (member is null)
             {
@@ -74,6 +74,18 @@ namespace GymManagement.PL.Controllers
         #region Health Record Details
         // GET baseUrl/Members/HealthRecordDetails/{id}
         // HealthRecordDetails - show one member's details 
+
+        public async Task<IActionResult> HealthRecordDetails(int id, CancellationToken ct = default)
+        {
+            var healthRecord = await _memberService.GetMemberHealthRecordAsync(id, ct);
+            if(healthRecord is null)
+            {
+                TempData["ErrorMessage"] = "Health Record Not Found!";
+                return RedirectToAction(nameof(Index), TempData);
+            }
+
+            return View(healthRecord);
+        }
         #endregion
 
         #region Edit Member

@@ -1,4 +1,5 @@
 ﻿using GymManagement.BLL.Services.Interfaces;
+using GymManagement.BLL.ViewModels.HealthRecordViewModels;
 using GymManagement.BLL.ViewModels.MemberViewModels;
 using GymManagement.DAL.Data.Models;
 using GymManagement.DAL.Repositories.Interfaces;
@@ -10,12 +11,14 @@ namespace GymManagement.BLL.Services.Classes
         private readonly IGenericRepository<Member> _memberRepo;
         private readonly IGenericRepository<MemberPlans> _memberShipRepo;
         private readonly IGenericRepository<Plan> _planRepo;
+        private readonly IGenericRepository<HealthRecord> _healthRecordRepo;
 
-        public MemberService(IGenericRepository<Member> memberRepo, IGenericRepository<MemberPlans> memberShipRepo, IGenericRepository<Plan> planRepo)
+        public MemberService(IGenericRepository<Member> memberRepo, IGenericRepository<MemberPlans> memberShipRepo, IGenericRepository<Plan> planRepo, IGenericRepository<HealthRecord> healthRecordRepo)
         {
             _memberRepo = memberRepo;
             _memberShipRepo = memberShipRepo;
             _planRepo = planRepo;
+            _healthRecordRepo = healthRecordRepo;
         }
         public async Task<IEnumerable<MemberViewModel>> GetMembersAsync(CancellationToken ct)
         {
@@ -98,7 +101,7 @@ namespace GymManagement.BLL.Services.Classes
             return rowsAffected > 0;
         }
 
-        public async Task<MemberViewModel?> GetMemberDetails(int id, CancellationToken ct = default)
+        public async Task<MemberViewModel?> GetMemberDetailsAsync(int id, CancellationToken ct = default)
         {
             var member = await _memberRepo.GetByIdAsync(id, ct);
             if (member == null) return null;
@@ -127,6 +130,22 @@ namespace GymManagement.BLL.Services.Classes
                 model.MemberShipStartDate = activeMembership.CreatedAt.ToString();
                 model.MemberShipEndDate = activeMembership.EndDate.ToString();
             }
+
+            return model;
+        }
+
+        public async Task<HealthRecordViewModel?> GetMemberHealthRecordAsync(int id, CancellationToken ct = default)
+        {
+            var healthRecord = await _healthRecordRepo.FirstOrDefaultAsync(x => x.MemberId == id, ct: ct);
+            if (healthRecord is null) return null;
+
+            var model = new HealthRecordViewModel()
+            {
+                Height = healthRecord.Height,
+                Weight = healthRecord.Weight,
+                BloodType = healthRecord.BloodType,
+                Note = healthRecord.Note
+            };
 
             return model;
         }
