@@ -13,13 +13,15 @@ namespace GymManagement.BLL.Services.Classes
         private readonly IGenericRepository<MemberPlans> _memberShipRepo;
         private readonly IGenericRepository<Plan> _planRepo;
         private readonly IGenericRepository<HealthRecord> _healthRecordRepo;
+        private readonly IGenericRepository<MemberSessions> _bookingRepo;
 
-        public MemberService(IGenericRepository<Member> memberRepo, IGenericRepository<MemberPlans> memberShipRepo, IGenericRepository<Plan> planRepo, IGenericRepository<HealthRecord> healthRecordRepo)
+        public MemberService(IGenericRepository<Member> memberRepo, IGenericRepository<MemberPlans> memberShipRepo, IGenericRepository<Plan> planRepo, IGenericRepository<HealthRecord> healthRecordRepo, IGenericRepository<MemberSessions> bookingRepo)
         {
             _memberRepo = memberRepo;
             _memberShipRepo = memberShipRepo;
             _planRepo = planRepo;
             _healthRecordRepo = healthRecordRepo;
+            _bookingRepo = bookingRepo;
         }
         public async Task<IEnumerable<MemberViewModel>> GetMembersAsync(CancellationToken ct)
         {
@@ -101,7 +103,6 @@ namespace GymManagement.BLL.Services.Classes
 
             return rowsAffected > 0;
         }
-
         public async Task<MemberViewModel?> GetMemberDetailsAsync(int id, CancellationToken ct = default)
         {
             var member = await _memberRepo.GetByIdAsync(id, ct);
@@ -134,7 +135,6 @@ namespace GymManagement.BLL.Services.Classes
 
             return model;
         }
-
         public async Task<HealthRecordViewModel?> GetMemberHealthRecordAsync(int id, CancellationToken ct = default)
         {
             var healthRecord = await _healthRecordRepo.FirstOrDefaultAsync(x => x.MemberId == id, ct: ct);
@@ -150,7 +150,6 @@ namespace GymManagement.BLL.Services.Classes
 
             return model;
         }
-
         public async Task<MemberToUpdateViewModel?> GetMemberToUpdateAsync(int id, CancellationToken ct = default)
         {
             var member = await _memberRepo.GetByIdAsync(id, ct);
@@ -169,7 +168,6 @@ namespace GymManagement.BLL.Services.Classes
 
             return model;
         }
-
         public async Task<bool> UpdateMemberAsync(int id,MemberToUpdateViewModel updatedMember, CancellationToken ct)
         {
             var member = await _memberRepo.GetByIdAsync(id, ct);
@@ -191,5 +189,18 @@ namespace GymManagement.BLL.Services.Classes
 
             return res > 0;
         }
+        public async Task<bool> RemoveMemberAsync(int id, CancellationToken ct = default)
+        {
+            var member = await _memberRepo.GetByIdAsync(id, ct);
+            if (member == null) return false;
+
+            var hasFutureBooking = await _bookingRepo.AnyAsync(x => x.MemberId == id && x.Session.StartDate > DateTime.Now);
+            if (hasFutureBooking) return false;
+
+            var res = await _memberRepo.DeleteAsync(member, ct);
+
+            return res > 0;
+        }
+
     }
 }
