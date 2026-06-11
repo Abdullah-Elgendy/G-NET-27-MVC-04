@@ -41,7 +41,7 @@ namespace GymManagement.PL.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateMemberViewModel model, CancellationToken ct)
         {
-            if (!ModelState.IsValid) return View(nameof(Create), model);
+            if (!ModelState.IsValid) return View(model);
 
             var res = await _memberService.CreateMemberAsync(model, ct);
 
@@ -132,7 +132,7 @@ namespace GymManagement.PL.Controllers
             var member = _memberService.GetMemberDetailsAsync(id, ct);
             if (member == null)
             {
-                TempData["ErrorMessage"] = "Failed To Update Member!";
+                TempData["ErrorMessage"] = "Failed To Remove Member!";
                 return RedirectToAction(nameof(Index), TempData);
             }
 

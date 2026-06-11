@@ -18,6 +18,7 @@ namespace GymManagement
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IMemberService, MemberService>();
             builder.Services.AddScoped<IPlansService, PlansService>();
+            builder.Services.AddScoped<ITrainersService, TrainersService>();
             builder.Services.AddDbContext<GymDbContext>(options => options.UseSqlServer($"{builder.Configuration.GetConnectionString("DefaultConnection")}"));
 
             var app = builder.Build();
