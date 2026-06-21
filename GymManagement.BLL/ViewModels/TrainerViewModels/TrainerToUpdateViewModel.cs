@@ -12,7 +12,7 @@ namespace GymManagement.BLL.ViewModels.TrainerViewModels
     {
 
         #region Personal Information
-        public string? Name { get; set; } = default!;
+        public string? Name { get; set; }
 
         [Required(ErrorMessage = "Email is required!")]
         [EmailAddress(ErrorMessage = "Invalid email format")]
@@ -25,9 +25,9 @@ namespace GymManagement.BLL.ViewModels.TrainerViewModels
         public string Phone { get; set; } = default!;
 
 
-        public DateOnly? DateOfBirth { get; set; } = default!;
+        public DateOnly? DateOfBirth { get; set; } 
 
-        public Gender? Gender { get; set; } = default!;
+        public Gender? Gender { get; set; }
         #endregion
 
 
